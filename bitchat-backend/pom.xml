@@ -206,8 +206,13 @@
             <version>1.5.15</version>
         </dependency>
 
-
-
+        <!-- https://mvnrepository.com/artifact/javax.websocket/javax.websocket-api -->
+        <dependency>
+            <groupId>javax.websocket</groupId>
+            <artifactId>javax.websocket-api</artifactId>
+            <version>1.1</version>
+            <scope>provided</scope>
+        </dependency>
 
     </dependencies>
 
@@ -269,68 +274,6 @@
                             <failOnMissingWebXml>false</failOnMissingWebXml>
                         </configuration>
                     </plugin>
-
-                    <!--
-
-                    <plugin>
-                        <groupId>org.codehaus.mojo</groupId>
-                        <artifactId>exec-maven-plugin</artifactId>
-                        <configuration>
-                            <workingDirectory>\${project.basedir}\..\bitchat-frontend\</workingDirectory>
-                            <executable>gulp</executable>
-                            <arguments>
-                                <argument>-prod</argument>
-                            </arguments>
-                        </configuration>
-                        <executions>
-                            <execution>
-                                <id>build-javascript</id>
-                                <phase>generate-resources</phase>
-                                <goals>
-                                    <goal>exec</goal>
-                                </goals>
-                            </execution>
-                        </executions>
-                    </plugin>
-                    <plugin>
-                        <artifactId>maven-resources-plugin</artifactId>
-                        <executions>
-                            <execution>
-                                <id>copy-resources</id>
-                                <phase>prepare-package</phase>
-                                <goals>
-                                    <goal>copy-resources</goal>
-                                </goals>
-                                <configuration>
-                                    <outputDirectory>${basedir}/target/bitchat/</outputDirectory>
-                                    <resources>
-                                        <resource>
-                                            <directory>../bitchat-frontend/dist/</directory>
-                                        </resource>
-                                    </resources>
-                                    <overwrite>true</overwrite>
-                                </configuration>
-
-                            </execution>
-
-                            <execution>
-                                <id>copy-resources-compile</id>
-                                <phase>prepare-package</phase>
-                                <goals>
-                                    <goal>copy-resources</goal>
-                                </goals>
-                                <configuration>
-                                    <outputDirectory>${basedir}/target/bitchat/</outputDirectory>
-                                    <resources>
-                                        <resource>
-                                            <directory>../bitchat-frontend/dist/bitchat/</directory>
-                                        </resource>
-                                    </resources>
-                                </configuration>
-                            </execution>
-                        </executions>
-                    </plugin> -->
-
 
                 </plugins>
 

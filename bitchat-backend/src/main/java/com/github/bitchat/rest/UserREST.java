@@ -79,7 +79,7 @@ public class UserREST {
     public User login(User user){
         User u = repository.findByLoginAndSenha(user.getLogin(), user.getSenha());
         if (u == null) {
-            throw new WebApplicationException(Response.Status.NOT_FOUND);
+            throw new WebApplicationException(Response.Status.BAD_REQUEST);
         }
         return u;
     }
@@ -90,7 +90,7 @@ public class UserREST {
     public User lookupUserById(@PathParam("id") long id) {
         User User = repository.findById(id);
         if (User == null) {
-            throw new WebApplicationException(Response.Status.NOT_FOUND);
+            throw new WebApplicationException(Response.Status.BAD_REQUEST);
         }
         return User;
     }
