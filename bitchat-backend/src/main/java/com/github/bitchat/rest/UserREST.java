@@ -19,6 +19,10 @@ package com.github.bitchat.rest;
 import com.github.bitchat.data.UserRepository;
 import com.github.bitchat.model.User;
 import com.github.bitchat.service.UserService;
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiResponse;
+import io.swagger.annotations.ApiResponses;
 
 import javax.enterprise.context.RequestScoped;
 import javax.inject.Inject;
@@ -40,7 +44,8 @@ import java.util.logging.Logger;
  */
 @Path("/user")
 @RequestScoped
-public class UserResourceRESTService {
+@Api( value = "/user", description = "Manage user" )
+public class UserREST {
 
     @Inject
     private Logger log;
@@ -58,6 +63,25 @@ public class UserResourceRESTService {
     @Produces(MediaType.APPLICATION_JSON)
     public List<User> listAllUsers() {
         return repository.findAllOrderedByName();
+    }
+
+
+    @POST
+    @Path("/login")
+    @Consumes(MediaType.APPLICATION_JSON)
+    @Produces(MediaType.APPLICATION_JSON)
+    @ApiOperation(value = "Verifica se o usuário e senha existem", httpMethod = "POST", notes = "Verifica se o usuário e senha existem", response = User.class)
+    @ApiResponses(value = { @ApiResponse(code = 200, message = "login encontrado"),
+            @ApiResponse(code = 404, message = "login não encontrado"),
+            @ApiResponse(code = 500, message = "Erro interno em função da decodificação dos dados"),
+            @ApiResponse(code = 400, message = "Erro no request em função da decodificação dos dados"),
+            @ApiResponse(code = 412, message = "Dados obrigatórios não encontrados") })
+    public User login(User user){
+        User u = repository.findByLoginAndSenha(user.getLogin(), user.getSenha());
+        if (u == null) {
+            throw new WebApplicationException(Response.Status.NOT_FOUND);
+        }
+        return u;
     }
 
     @GET
@@ -130,8 +154,8 @@ public class UserResourceRESTService {
             throw new ConstraintViolationException(new HashSet<ConstraintViolation<?>>(violations));
         }
 
-        // Check the uniqueness of the email address
-        if (emailAlreadyExists(user.getEmail())) {
+        // Check the uniqueness of the login
+        if (emailAlreadyExists(user.getLogin())) {
             throw new ValidationException("Unique Email Violation");
         }
     }

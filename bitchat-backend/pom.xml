@@ -193,6 +193,22 @@
             <scope>test</scope>
         </dependency>
 
+        <dependency>
+            <groupId>javax</groupId>
+            <artifactId>javaee-web-api</artifactId>
+            <version>7.0</version>
+        </dependency>
+
+        <!-- https://mvnrepository.com/artifact/io.swagger/swagger-jaxrs -->
+        <dependency>
+            <groupId>io.swagger</groupId>
+            <artifactId>swagger-jaxrs</artifactId>
+            <version>1.5.15</version>
+        </dependency>
+
+
+
+
     </dependencies>
 
     <build>
@@ -254,48 +270,7 @@
                         </configuration>
                     </plugin>
 
-
-                    <plugin>
-                        <groupId>org.codehaus.mojo</groupId>
-                        <artifactId>exec-maven-plugin</artifactId>
-                        <configuration>
-                            <workingDirectory>\${project.basedir}\..\bitchat-frontend\</workingDirectory>
-                            <executable>npm</executable>
-                            <arguments>
-                                <argument>install</argument>
-                            </arguments>
-                        </configuration>
-                        <executions>
-                            <execution>
-                                <id>build-javascript</id>
-                                <phase>generate-resources</phase>
-                                <goals>
-                                    <goal>exec</goal>
-                                </goals>
-                            </execution>
-                        </executions>
-                    </plugin>
-
-                    <plugin>
-                        <groupId>org.codehaus.mojo</groupId>
-                        <artifactId>exec-maven-plugin</artifactId>
-                        <configuration>
-                            <workingDirectory>\${project.basedir}\..\bitchat-frontend\</workingDirectory>
-                            <executable>bower</executable>
-                            <arguments>
-                                <argument>install</argument>
-                            </arguments>
-                        </configuration>
-                        <executions>
-                            <execution>
-                                <id>build-javascript</id>
-                                <phase>generate-resources</phase>
-                                <goals>
-                                    <goal>exec</goal>
-                                </goals>
-                            </execution>
-                        </executions>
-                    </plugin>
+                    <!--
 
                     <plugin>
                         <groupId>org.codehaus.mojo</groupId>
@@ -304,7 +279,7 @@
                             <workingDirectory>\${project.basedir}\..\bitchat-frontend\</workingDirectory>
                             <executable>gulp</executable>
                             <arguments>
-                                <argument>--prod</argument>
+                                <argument>-prod</argument>
                             </arguments>
                         </configuration>
                         <executions>
@@ -354,7 +329,7 @@
                                 </configuration>
                             </execution>
                         </executions>
-                    </plugin>
+                    </plugin> -->
 
 
                 </plugins>

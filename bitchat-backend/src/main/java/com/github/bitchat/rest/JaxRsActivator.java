@@ -16,8 +16,14 @@
  */
 package com.github.bitchat.rest;
 
+import io.swagger.jaxrs.config.BeanConfig;
+import io.swagger.jaxrs.listing.ApiListingResource;
+import io.swagger.jaxrs.listing.SwaggerSerializers;
+
 import javax.ws.rs.ApplicationPath;
 import javax.ws.rs.core.Application;
+import java.util.HashSet;
+import java.util.Set;
 
 /**
  * A class extending {@link Application} and annotated with @ApplicationPath is the Java EE 7 "no XML" approach to activating
@@ -29,5 +35,28 @@ import javax.ws.rs.core.Application;
  */
 @ApplicationPath("/rest")
 public class JaxRsActivator extends Application {
-    /* class body intentionally left blank */
+
+    public JaxRsActivator() {
+        BeanConfig conf = new BeanConfig();
+        conf.setTitle("BitChat API");
+        conf.setDescription("Chat with websocket");
+        conf.setVersion("1.0.0");
+        conf.setHost("localhost:8080");
+        conf.setBasePath("/bitchat/rest");
+        conf.setSchemes(new String[] { "http" });
+        conf.setResourcePackage("com.github.bitchat");
+        conf.setScan(true);
+    }
+
+    @Override
+    public Set<Class<?>> getClasses() {
+        Set<Class<?>> resources = new HashSet<>();
+        resources.add(UserREST.class);
+
+        //classes do swagger...
+        resources.add(ApiListingResource.class);
+        resources.add(SwaggerSerializers.class);
+        return resources;
+    }
+
 }

@@ -38,7 +38,7 @@ public class UserService {
     private Event<User> memberEventSrc;
 
     public void register(User member) throws Exception {
-        log.info("Registering " + member.getName());
+        log.info("Registering " + member.getNome());
         em.persist(member);
         memberEventSrc.fire(member);
     }

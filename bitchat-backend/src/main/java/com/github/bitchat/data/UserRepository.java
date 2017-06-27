@@ -16,6 +16,8 @@
  */
 package com.github.bitchat.data;
 
+import com.github.bitchat.model.User;
+
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
 import javax.persistence.EntityManager;
@@ -23,8 +25,6 @@ import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.CriteriaQuery;
 import javax.persistence.criteria.Root;
 import java.util.List;
-
-import com.github.bitchat.model.User;
 
 @ApplicationScoped
 public class UserRepository {
@@ -45,6 +45,18 @@ public class UserRepository {
         // criteria.select(User).where(cb.equal(User.get(User_.name), email));
         criteria.select(User).where(cb.equal(User.get("email"), email));
         return em.createQuery(criteria).getSingleResult();
+    }
+
+    public User findByLoginAndSenha(String login, String senha) {
+        CriteriaBuilder cb = em.getCriteriaBuilder();
+        CriteriaQuery<User> criteria = cb.createQuery(User.class);
+        Root<User> User = criteria.from(User.class);
+        criteria.select(User).where(cb.equal(User.get("login"), login), cb.equal(User.get("senha"), senha));
+        List<User> l = em.createQuery(criteria).getResultList();
+        if (l != null && l.size() >0){
+            return l.get(0);
+        }
+        return null;
     }
 
     public List<User> findAllOrderedByName() {
