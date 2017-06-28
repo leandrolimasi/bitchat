@@ -16,6 +16,7 @@
  */
 package com.github.bitchat.data;
 
+import com.github.bitchat.model.Contact;
 import com.github.bitchat.model.User;
 
 import javax.enterprise.context.ApplicationScoped;
@@ -27,44 +28,26 @@ import javax.persistence.criteria.Root;
 import java.util.List;
 
 @ApplicationScoped
-public class UserRepository {
+public class ContactRepository {
 
     @Inject
     private EntityManager em;
 
-    public User findById(Long id) {
-        return em.find(User.class, id);
+    public Contact findById(Long id) {
+        return em.find(Contact.class, id);
     }
 
-    public User findByLogin(String login) {
+    public Contact findByUser(User user) {
         CriteriaBuilder cb = em.getCriteriaBuilder();
-        CriteriaQuery<User> criteria = cb.createQuery(User.class);
-        Root<User> user = criteria.from(User.class);
-        criteria.select(user).where(cb.equal(user.get("login"), login));
-        List<User> l = em.createQuery(criteria).getResultList();
+        CriteriaQuery<Contact> criteria = cb.createQuery(Contact.class);
+        Root<Contact> contact = criteria.from(Contact.class);
+        criteria.select(contact).where(cb.equal(contact.get("user"), user));
+        List<Contact> l = em.createQuery(criteria).getResultList();
         if (l != null && l.size() >0){
             return l.get(0);
         }
         return null;
     }
 
-    public User findByLoginAndSenha(String login, String senha) {
-        CriteriaBuilder cb = em.getCriteriaBuilder();
-        CriteriaQuery<User> criteria = cb.createQuery(User.class);
-        Root<User> User = criteria.from(User.class);
-        criteria.select(User).where(cb.equal(User.get("login"), login), cb.equal(User.get("password"), senha));
-        List<User> l = em.createQuery(criteria).getResultList();
-        if (l != null && l.size() >0){
-            return l.get(0);
-        }
-        return null;
-    }
 
-    public List<User> findAllOrderedByName() {
-        CriteriaBuilder cb = em.getCriteriaBuilder();
-        CriteriaQuery<User> criteria = cb.createQuery(User.class);
-        Root<User> User = criteria.from(User.class);
-        criteria.select(User).orderBy(cb.asc(User.get("name")));
-        return em.createQuery(criteria).getResultList();
-    }
 }

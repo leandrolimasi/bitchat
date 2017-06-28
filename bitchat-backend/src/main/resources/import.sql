@@ -16,4 +16,4 @@
 --
 
 -- You can use this file to load seed data into the database using SQL statements
-insert into User (id, login, nome, senha) values (0, 'admin','John Smith', '123456')
+insert into User (id, login, name, password) values (0, 'admin','John Smith', '123456')

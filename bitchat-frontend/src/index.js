@@ -1,6 +1,7 @@
 angular
     .module('app', ['ui.router', 'ui-notification'])
     .constant('BackendUrl', 'http://localhost:8080/bitchat')
+    .constant('WebsocketUrl', 'ws://localhost:8080/bitchat')
     .config(function(NotificationProvider) {
         NotificationProvider.setOptions({
             delay: 10000,
@@ -15,11 +16,15 @@ angular
 /** @ngInject */
 function runBlock($rootScope, $state) {
 
-    console.log($rootScope.user);
+    $rootScope.$on('$stateChangeStart', function(event, toState, toParams, fromState, fromParams){
+        console.log($rootScope.user);
 
-    if (angular.isUndefined($rootScope.user)){
-        $state.go('login');
-    }
+        if (angular.isUndefined($rootScope.user)){
+            $state.go('login');
+        }
+    });
+
+
 
 
 }

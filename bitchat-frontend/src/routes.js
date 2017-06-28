@@ -10,9 +10,9 @@ function routesConfig($stateProvider, $urlRouterProvider, $locationProvider) {
 
 
     $stateProvider
-        .state('app', {
+        .state('login', {
             url: '/',
-            component: 'app'
+            component: 'login'
         });
 
 
@@ -24,9 +24,9 @@ function routesConfig($stateProvider, $urlRouterProvider, $locationProvider) {
 
 
     $stateProvider
-        .state('registrar', {
-            url: '/registrar',
-            component: 'registrar'
+        .state('register', {
+            url: '/register',
+            component: 'register'
         });
 
     $stateProvider

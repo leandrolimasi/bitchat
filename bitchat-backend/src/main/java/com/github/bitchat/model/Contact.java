@@ -29,29 +29,22 @@ import java.io.Serializable;
 @SuppressWarnings("serial")
 @Entity
 @XmlRootElement
-@Table(uniqueConstraints = @UniqueConstraint(columnNames = "login"))
-@ApiModel( value = "User", description = "User resource representation" )
-public class User implements Serializable {
+@Table
+@ApiModel( value = "Contact", description = "User Contact resource representation" )
+public class Contact implements Serializable {
 
     @Id
     @GeneratedValue
-    @ApiModelProperty( value = "codigo")
+    @ApiModelProperty( value = "codigo", required = true )
     private Long id;
 
-    @NotNull
-    @Size(min = 1, max = 25)
-    @ApiModelProperty( value = "login", required = true )
-    private String login;
+    @ManyToOne(cascade = CascadeType.ALL)
+    @ApiModelProperty( value = "usuario", required = true )
+    private User user;
 
-    @NotNull
-    @Size(min = 1, max = 100)
-    @ApiModelProperty( value = "nome do usuário", required = true )
-    private String name;
-
-    @NotNull
-    @NotEmpty
-    @ApiModelProperty( value = "senha", required = true )
-    private String password;
+    @ManyToOne(cascade = CascadeType.ALL)
+    @ApiModelProperty( value = "contato", required = true )
+    private User contact;
 
 
     /**
@@ -69,46 +62,30 @@ public class User implements Serializable {
     }
 
     /**
-     * @return the login
+     * @return the user
      */
-    public String getLogin() {
-        return login;
+    public User getUser() {
+        return user;
     }
 
     /**
-     * @param login the login to set
+     * @param user the user to set
      */
-    public void setLogin(String login) {
-        this.login = login;
-    }
-
-
-    /**
-     * @return the password
-     */
-    public String getPassword() {
-        return password;
+    public void setUser(User user) {
+        this.user = user;
     }
 
     /**
-     * @param password the password to set
+     * @return the contact
      */
-    public void setPassword(String password) {
-        this.password = password;
+    public User getContact() {
+        return contact;
     }
 
     /**
-     * @return the name
+     * @param contact the contact to set
      */
-    public String getName() {
-        return name;
+    public void setContact(User contact) {
+        this.contact = contact;
     }
-
-    /**
-     * @param name the name to set
-     */
-    public void setName(String name) {
-        this.name = name;
-    }
-
 }

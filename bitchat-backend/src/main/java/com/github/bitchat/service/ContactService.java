@@ -16,22 +16,26 @@
  */
 package com.github.bitchat.service;
 
+import com.github.bitchat.data.ContactRepository;
 import com.github.bitchat.data.UserRepository;
+import com.github.bitchat.model.Contact;
 import com.github.bitchat.model.User;
 
 import javax.ejb.Stateless;
 import javax.enterprise.event.Event;
 import javax.inject.Inject;
 import javax.persistence.EntityManager;
-import java.util.List;
 import java.util.logging.Logger;
 
 // The @Stateless annotation eliminates the need for manual transaction demarcation
 @Stateless
-public class UserService {
+public class ContactService {
 
     @Inject
-    private UserRepository repository;
+    private ContactRepository repository;
+
+    @Inject
+    private UserRepository userRepository;
 
     @Inject
     private Logger log;
@@ -40,27 +44,20 @@ public class UserService {
     private EntityManager em;
 
     @Inject
-    private Event<User> memberEventSrc;
+    private Event<Contact> contactEventSrc;
 
-    public void register(User user) throws Exception {
-        log.info("Registering " + user.getName());
-        em.persist(user);
-        memberEventSrc.fire(user);
+    public void addContact(Contact contact) throws Exception {
+        contact.setContact(userRepository.findById(contact.getContact().getId()));
+        contact.setUser(userRepository.findById(contact.getUser().getId()));
+        em.persist(contact);
+        contactEventSrc.fire(contact);
     }
 
-    public List<User> findAllOrderedByName() {
-        return repository.findAllOrderedByName();
-    }
-
-    public User findByLoginAndSenha(String login, String senha) {
-        return repository.findByLoginAndSenha(login, senha);
-    }
-
-    public User findById(Long id) {
+    public Contact findById(Long id) {
         return repository.findById(id);
     }
 
-    public User findByLogin(String login) {
-        return repository.findByLogin(login);
+    public Contact findByUser(User user) {
+        return repository.findByUser(user);
     }
 }

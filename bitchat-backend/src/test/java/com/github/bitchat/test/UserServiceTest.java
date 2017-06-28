@@ -46,7 +46,7 @@ public class UserServiceTest {
     }
 
     @Inject
-    UserService memberRegistration;
+    UserService userService;
 
     @Inject
     Logger log;
@@ -54,12 +54,12 @@ public class UserServiceTest {
     @Test
     public void testRegister() throws Exception {
         User newMember = new User();
-        newMember.setNome("Jane Doe");
+        newMember.setName("Jane Doe");
         newMember.setLogin("admin");
-        newMember.setSenha("123456");
-        memberRegistration.register(newMember);
+        newMember.setPassword("123456");
+        userService.register(newMember);
         assertNotNull(newMember.getId());
-        log.info(newMember.getNome() + " was persisted with id " + newMember.getId());
+        log.info(newMember.getName() + " was persisted with id " + newMember.getId());
     }
 
 }

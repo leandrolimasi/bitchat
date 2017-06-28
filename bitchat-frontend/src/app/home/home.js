@@ -3,38 +3,42 @@ angular
     .service('LoginService', LoginService)
     .component('home', {
         templateUrl: 'app/home/home.html',
-        controller: function (BackendUrl, $state, $http, $log, $scope, $rootScope, $stateParams, Notification) {
+        controller: function (BackendUrl, WebsocketUrl, $state, $http, $log, $scope, $rootScope, $stateParams, Notification) {
             var ctrl = this;
 
             ctrl.logout = function() {
-
+                $rootScope.user =  undefined;
+                $state.go('login');
             };
 
 
             ctrl.addContact = function(contact) {
+                
+                $http.get(BackendUrl+"/rest/user/"+contact.login).then(function(response) {
+                        var c = {}
+                        c.contact = response.data;
+                        c.user  = $rootScope.user;
 
-                $http.get(BackendUrl+"/rest/user/addcontact/"+contact.login).then(function(response) {
-                        var msgContainer = document.getElementById('msgContainer');
-                        var div = document.createElement('div');
-                        div.setAttribute('class', 'alert alert-success');
-                        var textnode = document.createTextNode("Contato " + contact.contactLogin + " adicionado com sucesso!");
-                        div.appendChild(textnode);
-                        msgContainer.appendChild(div);
-                        delete $scope.contact;
-                        $scope.listContacts();
+                        $http.post(BackendUrl+"/rest/user/addContact/", c).then(function(response) {
 
-                        Notification.success('Success notification');
+                                Notification.success('Contact added');
+                            },
+
+                            function (response) {
+
+                                Notification.error('Error in add contact');
+                            });
+
                     },
 
                     function (response) {
-                        console.log("Error: response from submitting data to server was: " + response);
 
-                        Notification.success('Success notification');
+                        Notification.error('Error in add contact');
                     });
 
             };
 
-            var websocket = new WebSocket("ws://localhost:8080/bitchat/chat");
+            var websocket = new WebSocket(WebsocketUrl+"/chat");
 
             ctrl.openChat = function(idUserContact, contactLogin) {
 

@@ -16,8 +16,9 @@
  */
 package com.github.bitchat.rest;
 
-import com.github.bitchat.data.UserRepository;
+import com.github.bitchat.model.Contact;
 import com.github.bitchat.model.User;
+import com.github.bitchat.service.ContactService;
 import com.github.bitchat.service.UserService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -54,15 +55,15 @@ public class UserREST {
     private Validator validator;
 
     @Inject
-    private UserRepository repository;
+    private UserService userService;
 
     @Inject
-    UserService registration;
+    private ContactService contactService;
 
     @GET
     @Produces(MediaType.APPLICATION_JSON)
     public List<User> listAllUsers() {
-        return repository.findAllOrderedByName();
+        return userService.findAllOrderedByName();
     }
 
 
@@ -77,7 +78,7 @@ public class UserREST {
             @ApiResponse(code = 400, message = "Erro no request em função da decodificação dos dados"),
             @ApiResponse(code = 412, message = "Dados obrigatórios não encontrados") })
     public User login(User user){
-        User u = repository.findByLoginAndSenha(user.getLogin(), user.getSenha());
+        User u = userService.findByLoginAndSenha(user.getLogin(), user.getPassword());
         if (u == null) {
             throw new WebApplicationException(Response.Status.BAD_REQUEST);
         }
@@ -88,7 +89,29 @@ public class UserREST {
     @Path("/{id:[0-9][0-9]*}")
     @Produces(MediaType.APPLICATION_JSON)
     public User lookupUserById(@PathParam("id") long id) {
-        User User = repository.findById(id);
+        User User = userService.findById(id);
+        if (User == null) {
+            throw new WebApplicationException(Response.Status.BAD_REQUEST);
+        }
+        return User;
+    }
+
+    @GET
+    @Path("/{login}")
+    @Produces(MediaType.APPLICATION_JSON)
+    public User getByLogin(@PathParam("login") String login) {
+        User User = userService.findByLogin(login);
+        if (User == null) {
+            throw new WebApplicationException(Response.Status.BAD_REQUEST);
+        }
+        return User;
+    }
+
+    @GET
+    @Path("/{login}")
+    @Produces(MediaType.APPLICATION_JSON)
+    public User getByLogin(@PathParam("login") String login) {
+        User User = userService.findByLogin(login);
         if (User == null) {
             throw new WebApplicationException(Response.Status.BAD_REQUEST);
         }
@@ -100,17 +123,15 @@ public class UserREST {
      * or with a map of fields, and related errors.
      */
     @POST
+    @Path("/addContact")
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
-    public Response createUser(User user) {
+    public Response addContactUser(Contact contact) {
 
         Response.ResponseBuilder builder = null;
 
         try {
-            // Validates User using bean validation
-            validateUser(user);
-
-            registration.register(user);
+            contactService.addContact(contact);
 
             // Create an "ok" response
             builder = Response.ok();
@@ -120,7 +141,50 @@ public class UserREST {
         } catch (ValidationException e) {
             // Handle the unique constrain violation
             Map<String, String> responseObj = new HashMap<>();
-            responseObj.put("email", "Email taken");
+            responseObj.put("login", "Email taken");
+            builder = Response.status(Response.Status.CONFLICT).entity(responseObj);
+        } catch (Exception e) {
+            // Handle generic exceptions
+            Map<String, String> responseObj = new HashMap<>();
+            responseObj.put("error", e.getMessage());
+            builder = Response.status(Response.Status.BAD_REQUEST).entity(responseObj);
+        }
+
+        return builder.build();
+    }
+
+    /**
+     * Creates a new User from the values provided. Performs validation, and will return a JAX-RS response with either 200 ok,
+     * or with a map of fields, and related errors.
+     */
+    @POST
+    @Path("/register")
+    @Consumes(MediaType.APPLICATION_JSON)
+    @Produces(MediaType.APPLICATION_JSON)
+    @ApiOperation(value = "Registra um novo usu[ario", httpMethod = "POST", notes = "cria um novo usuário", response = User.class)
+    @ApiResponses(value = { @ApiResponse(code = 200, message = "usuario criado com sucesso"),
+            @ApiResponse(code = 500, message = "Erro interno em função da decodificação dos dados"),
+            @ApiResponse(code = 400, message = "Erro no request em função da decodificação dos dados"),
+            @ApiResponse(code = 412, message = "Dados obrigatórios não encontrados") })
+    public Response createUser(User user) {
+
+        Response.ResponseBuilder builder = null;
+
+        try {
+            // Validates User using bean validation
+            validateUser(user);
+
+            userService.register(user);
+
+            // Create an "ok" response
+            builder = Response.ok();
+        } catch (ConstraintViolationException ce) {
+            // Handle bean validation issues
+            builder = createViolationResponse(ce.getConstraintViolations());
+        } catch (ValidationException e) {
+            // Handle the unique constrain violation
+            Map<String, String> responseObj = new HashMap<>();
+            responseObj.put("login", "Email taken");
             builder = Response.status(Response.Status.CONFLICT).entity(responseObj);
         } catch (Exception e) {
             // Handle generic exceptions
@@ -155,7 +219,7 @@ public class UserREST {
         }
 
         // Check the uniqueness of the login
-        if (emailAlreadyExists(user.getLogin())) {
+        if (loginAlreadyExists(user.getLogin())) {
             throw new ValidationException("Unique Email Violation");
         }
     }
@@ -186,10 +250,10 @@ public class UserREST {
      * @param email The email to check
      * @return True if the email already exists, and false otherwise
      */
-    public boolean emailAlreadyExists(String email) {
+    public boolean loginAlreadyExists(String email) {
         User User = null;
         try {
-            User = repository.findByEmail(email);
+            User = userService.findByLogin(email);
         } catch (NoResultException e) {
             // ignore
         }
