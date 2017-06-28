@@ -4,9 +4,6 @@ Author: Leandro Lima
 
 Technologies: JavaEE7, AngularJs, Node.JS, Gulp, Bower
 
-Summary: Example Project for chat using Websocket
-
-
 
 Development requirements
 -------------------
@@ -30,33 +27,34 @@ Bower 1.6.x or newer
 
 Build setup
 -------------------------
-$ cd ./bitchat-frontend
+   
 
 Install Gulp, Gulp CLI and Bower
 
-$ npm install -g gulp
-$ npm install -g gulp-cli
-$ npm install -g bower
+    $ cd ./bitchat-frontend
+    $ npm install -g gulp
+    $ npm install -g gulp-cli
+    $ npm install -g bower
 
 
 After install all plugins, execute this
 
-$ npm install
-$ bower install
+    $ npm install
+    $ bower install
 
 Change a backend and websocket URL in index.js
 
-.constant('BackendUrl', 'http://localhost:8080/bitchat')
-.constant('WebsocketUrl', 'ws://localhost:8080/bitchat')
+    .constant('BackendUrl', 'http://localhost:8080/bitchat')
+    .constant('WebsocketUrl', 'ws://localhost:8080/bitchat')
 
 Execute the frontend project in production mode:
 
-$ gulp serve:dist
+    $ gulp serve:dist
 
-And now build a backend project
+And now build the backend project
 
-$ cd ../bitchat-backend
-$ mvn clean install
+    $ cd ../bitchat-backend
+    $ mvn clean install
 
 And deploy on Wildfly.
 
