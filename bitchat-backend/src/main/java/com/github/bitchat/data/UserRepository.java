@@ -26,45 +26,70 @@ import javax.persistence.criteria.CriteriaQuery;
 import javax.persistence.criteria.Root;
 import java.util.List;
 
+/** Repository for User
+ * 
+ * @author leandrolimadasilva
+ *
+ */
 @ApplicationScoped
 public class UserRepository {
 
     @Inject
     private EntityManager em;
 
+    /** find user by id
+     * 
+     * @param id
+     * @return
+     */
     public User findById(Long id) {
         return em.find(User.class, id);
     }
 
+    /** find user by id
+     * 
+     * @param login
+     * @return
+     */
     public User findByLogin(String login) {
         CriteriaBuilder cb = em.getCriteriaBuilder();
         CriteriaQuery<User> criteria = cb.createQuery(User.class);
         Root<User> user = criteria.from(User.class);
         criteria.select(user).where(cb.equal(user.get("login"), login));
         List<User> l = em.createQuery(criteria).getResultList();
-        if (l != null && l.size() >0){
+        if (l != null && !l.isEmpty()){
             return l.get(0);
         }
         return null;
     }
 
-    public User findByLoginAndSenha(String login, String senha) {
+    /** find user by login and password
+     * 
+     * @param login
+     * @param password
+     * @return
+     */
+    public User findByLoginAndPassword(String login, String password) {
         CriteriaBuilder cb = em.getCriteriaBuilder();
         CriteriaQuery<User> criteria = cb.createQuery(User.class);
-        Root<User> User = criteria.from(User.class);
-        criteria.select(User).where(cb.equal(User.get("login"), login), cb.equal(User.get("password"), senha));
+        Root<User> user = criteria.from(User.class);
+        criteria.select(user).where(cb.equal(user.get("login"), login), cb.equal(user.get("password"), password));
         List<User> l = em.createQuery(criteria).getResultList();
-        if (l != null && l.size() >0){
+        if (l != null && !l.isEmpty()){
             return l.get(0);
         }
         return null;
     }
 
+    /** find all users
+     * 
+     * @return
+     */
     public List<User> findAllOrderedByName() {
         CriteriaBuilder cb = em.getCriteriaBuilder();
         CriteriaQuery<User> criteria = cb.createQuery(User.class);
-        Root<User> User = criteria.from(User.class);
-        criteria.select(User).orderBy(cb.asc(User.get("name")));
+        Root<User> user = criteria.from(User.class);
+        criteria.select(user).orderBy(cb.asc(user.get("name")));
         return em.createQuery(criteria).getResultList();
     }
 }

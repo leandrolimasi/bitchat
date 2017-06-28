@@ -5,7 +5,8 @@
     "angular": "^1.6.2",
     "angular-ui-router": "1.0.0-beta.3",
     "moment": "^2.18.1",
-    "angular-ui-notification": "^0.3.6"
+    "angular-ui-notification": "^0.3.6",
+    "angular-cookies": "^1.6.4"
   },
   "devDependencies": {
     "angular-mocks": "^1.6.2"

@@ -26,6 +26,11 @@ import javax.validation.constraints.Size;
 import javax.xml.bind.annotation.XmlRootElement;
 import java.io.Serializable;
 
+/** Entity for User
+ * 
+ * @author leandrolimadasilva
+ *
+ */
 @SuppressWarnings("serial")
 @Entity
 @XmlRootElement
@@ -35,7 +40,7 @@ public class User implements Serializable {
 
     @Id
     @GeneratedValue
-    @ApiModelProperty( value = "codigo")
+    @ApiModelProperty( value = "id")
     private Long id;
 
     @NotNull
@@ -45,13 +50,16 @@ public class User implements Serializable {
 
     @NotNull
     @Size(min = 1, max = 100)
-    @ApiModelProperty( value = "nome do usuário", required = true )
+    @ApiModelProperty( value = "name", required = true )
     private String name;
 
     @NotNull
     @NotEmpty
-    @ApiModelProperty( value = "senha", required = true )
+    @ApiModelProperty( value = "password" )
     private String password;
+    
+    @Column(name = "STATUS") 
+	private Short status; 
 
 
     /**

@@ -27,27 +27,37 @@ import javax.persistence.criteria.CriteriaQuery;
 import javax.persistence.criteria.Root;
 import java.util.List;
 
+/** Repository for Contact
+ * 
+ * @author leandrolimadasilva
+ *
+ */
 @ApplicationScoped
 public class ContactRepository {
 
     @Inject
     private EntityManager em;
 
+    /** find contact by id
+     * 
+     * @param id
+     * @return
+     */
     public Contact findById(Long id) {
         return em.find(Contact.class, id);
     }
 
-    public Contact findByUser(User user) {
+    /** find contact by user
+     * 
+     * @param user
+     * @return
+     */
+    public List<Contact> findByUser(User user) {
         CriteriaBuilder cb = em.getCriteriaBuilder();
         CriteriaQuery<Contact> criteria = cb.createQuery(Contact.class);
         Root<Contact> contact = criteria.from(Contact.class);
         criteria.select(contact).where(cb.equal(contact.get("user"), user));
-        List<Contact> l = em.createQuery(criteria).getResultList();
-        if (l != null && l.size() >0){
-            return l.get(0);
-        }
-        return null;
+        return em.createQuery(criteria).getResultList();
     }
-
 
 }

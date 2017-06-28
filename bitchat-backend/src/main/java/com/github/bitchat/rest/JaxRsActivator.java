@@ -36,11 +36,14 @@ import java.util.Set;
 @ApplicationPath("/rest")
 public class JaxRsActivator extends Application {
 
+	/**
+	 *  Swagger settings
+	 */
     public JaxRsActivator() {
         BeanConfig conf = new BeanConfig();
         conf.setTitle("BitChat API");
-        conf.setDescription("Chat with websocket");
-        conf.setVersion("1.0.0");
+        conf.setDescription("Chat com Websocket");
+        conf.setVersion("1.0");
         conf.setHost("localhost:8080");
         conf.setBasePath("/bitchat/rest");
         conf.setSchemes(new String[] { "http" });
@@ -53,7 +56,6 @@ public class JaxRsActivator extends Application {
         Set<Class<?>> resources = new HashSet<>();
         resources.add(UserREST.class);
 
-        //classes do swagger...
         resources.add(ApiListingResource.class);
         resources.add(SwaggerSerializers.class);
         return resources;

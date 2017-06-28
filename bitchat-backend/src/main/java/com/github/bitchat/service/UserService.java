@@ -16,17 +16,24 @@
  */
 package com.github.bitchat.service;
 
-import com.github.bitchat.data.UserRepository;
-import com.github.bitchat.model.User;
+import java.util.List;
+import java.util.logging.Logger;
 
 import javax.ejb.Stateless;
 import javax.enterprise.event.Event;
 import javax.inject.Inject;
 import javax.persistence.EntityManager;
-import java.util.List;
-import java.util.logging.Logger;
+
+import com.github.bitchat.data.UserRepository;
+import com.github.bitchat.model.User;
 
 // The @Stateless annotation eliminates the need for manual transaction demarcation
+/**
+ * Service EJB for User
+ * 
+ * @author leandrolimadasilva
+ *
+ */
 @Stateless
 public class UserService {
 
@@ -42,24 +49,50 @@ public class UserService {
     @Inject
     private Event<User> memberEventSrc;
 
+    /**
+     * 
+     * @param user
+     * @throws Exception
+     */
     public void register(User user) throws Exception {
         log.info("Registering " + user.getName());
         em.persist(user);
         memberEventSrc.fire(user);
     }
 
+    /**
+     * 
+     * @return
+     */
     public List<User> findAllOrderedByName() {
         return repository.findAllOrderedByName();
     }
 
-    public User findByLoginAndSenha(String login, String senha) {
-        return repository.findByLoginAndSenha(login, senha);
+    /**
+     * 
+     * @param login
+     * @param password
+     * @return
+     */
+    public User findByLoginAndPassword(String login, String password) {
+        return repository.findByLoginAndPassword(login, password);
     }
 
+    /**
+     * 
+     * @param id
+     * @return
+     */
     public User findById(Long id) {
         return repository.findById(id);
     }
 
+    
+    /**
+     * 
+     * @param login
+     * @return
+     */
     public User findByLogin(String login) {
         return repository.findByLogin(login);
     }

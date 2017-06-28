@@ -16,14 +16,12 @@
  */
 package com.github.bitchat.rest;
 
-import com.github.bitchat.model.Contact;
-import com.github.bitchat.model.User;
-import com.github.bitchat.service.ContactService;
-import com.github.bitchat.service.UserService;
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiOperation;
-import io.swagger.annotations.ApiResponse;
-import io.swagger.annotations.ApiResponses;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.logging.Logger;
 
 import javax.enterprise.context.RequestScoped;
 import javax.inject.Inject;
@@ -32,11 +30,25 @@ import javax.validation.ConstraintViolation;
 import javax.validation.ConstraintViolationException;
 import javax.validation.ValidationException;
 import javax.validation.Validator;
-import javax.ws.rs.*;
+import javax.ws.rs.Consumes;
+import javax.ws.rs.GET;
+import javax.ws.rs.POST;
+import javax.ws.rs.Path;
+import javax.ws.rs.PathParam;
+import javax.ws.rs.Produces;
+import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
-import java.util.*;
-import java.util.logging.Logger;
+
+import com.github.bitchat.model.Contact;
+import com.github.bitchat.model.User;
+import com.github.bitchat.service.ContactService;
+import com.github.bitchat.service.UserService;
+
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiResponse;
+import io.swagger.annotations.ApiResponses;
 
 /**
  * JAX-RS Example
@@ -45,7 +57,7 @@ import java.util.logging.Logger;
  */
 @Path("/user")
 @RequestScoped
-@Api( value = "/user", description = "Manage user" )
+@Api( value = "/user" )
 public class UserREST {
 
     @Inject
@@ -66,7 +78,7 @@ public class UserREST {
         return userService.findAllOrderedByName();
     }
 
-
+    
     @POST
     @Path("/login")
     @Consumes(MediaType.APPLICATION_JSON)
@@ -78,10 +90,11 @@ public class UserREST {
             @ApiResponse(code = 400, message = "Erro no request em função da decodificação dos dados"),
             @ApiResponse(code = 412, message = "Dados obrigatórios não encontrados") })
     public User login(User user){
-        User u = userService.findByLoginAndSenha(user.getLogin(), user.getPassword());
+        User u = userService.findByLoginAndPassword(user.getLogin(), user.getPassword());
         if (u == null) {
             throw new WebApplicationException(Response.Status.BAD_REQUEST);
         }
+        u.setPassword(null);
         return u;
     }
 
@@ -89,43 +102,53 @@ public class UserREST {
     @Path("/{id:[0-9][0-9]*}")
     @Produces(MediaType.APPLICATION_JSON)
     public User lookupUserById(@PathParam("id") long id) {
-        User User = userService.findById(id);
-        if (User == null) {
+        User user = userService.findById(id);
+        if (user == null) {
             throw new WebApplicationException(Response.Status.BAD_REQUEST);
         }
-        return User;
+        user.setPassword(null);
+        return user;
     }
 
+    @GET
+    @Path("/contacts/{login}")
+    @Produces(MediaType.APPLICATION_JSON)
+    @ApiOperation(value = "Recupera os contatos de um usuários", httpMethod = "POST", notes = "lista de contatos do usuário", response = User.class)
+    @ApiResponses(value = { @ApiResponse(code = 200, message = "lista de usuários carregada com sucesso"),
+            @ApiResponse(code = 500, message = "Erro interno em função da decodificação dos dados"),
+            @ApiResponse(code = 400, message = "Erro no request em função da decodificação dos dados"),
+            @ApiResponse(code = 412, message = "Dados obrigatórios não encontrados") })
+    public List<Contact> getContactsByLogin(@PathParam("login") String login) {
+        User user = userService.findByLogin(login);
+        if (user == null) {
+            throw new WebApplicationException(Response.Status.BAD_REQUEST);
+        }
+        user.setPassword(null);
+        return contactService.findByUser(user);
+    }
+    
     @GET
     @Path("/{login}")
     @Produces(MediaType.APPLICATION_JSON)
     public User getByLogin(@PathParam("login") String login) {
-        User User = userService.findByLogin(login);
-        if (User == null) {
+        User user = userService.findByLogin(login);
+        if (user == null) {
             throw new WebApplicationException(Response.Status.BAD_REQUEST);
         }
-        return User;
+        user.setPassword(null);
+        return user;
     }
 
-    @GET
-    @Path("/{login}")
-    @Produces(MediaType.APPLICATION_JSON)
-    public User getByLogin(@PathParam("login") String login) {
-        User User = userService.findByLogin(login);
-        if (User == null) {
-            throw new WebApplicationException(Response.Status.BAD_REQUEST);
-        }
-        return User;
-    }
-
-    /**
-     * Creates a new User from the values provided. Performs validation, and will return a JAX-RS response with either 200 ok,
-     * or with a map of fields, and related errors.
-     */
+  
     @POST
     @Path("/addContact")
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
+    @ApiOperation(value = "Adicina o novo contato ao usuário", httpMethod = "POST", notes = "adiciona um contato pelo login", response = User.class)
+    @ApiResponses(value = { @ApiResponse(code = 200, message = "contato adicionado com sucesso"),
+            @ApiResponse(code = 500, message = "Erro interno em função da decodificação dos dados"),
+            @ApiResponse(code = 400, message = "Erro no request em função da decodificação dos dados"),
+            @ApiResponse(code = 412, message = "Dados obrigatórios não encontrados") })
     public Response addContactUser(Contact contact) {
 
         Response.ResponseBuilder builder = null;
@@ -138,16 +161,19 @@ public class UserREST {
         } catch (ConstraintViolationException ce) {
             // Handle bean validation issues
             builder = createViolationResponse(ce.getConstraintViolations());
+            log.severe(ce.getLocalizedMessage());
         } catch (ValidationException e) {
             // Handle the unique constrain violation
             Map<String, String> responseObj = new HashMap<>();
             responseObj.put("login", "Email taken");
             builder = Response.status(Response.Status.CONFLICT).entity(responseObj);
+            log.severe(e.getLocalizedMessage());
         } catch (Exception e) {
             // Handle generic exceptions
             Map<String, String> responseObj = new HashMap<>();
             responseObj.put("error", e.getMessage());
             builder = Response.status(Response.Status.BAD_REQUEST).entity(responseObj);
+            log.severe(e.getLocalizedMessage());
         }
 
         return builder.build();
@@ -161,7 +187,7 @@ public class UserREST {
     @Path("/register")
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
-    @ApiOperation(value = "Registra um novo usu[ario", httpMethod = "POST", notes = "cria um novo usuário", response = User.class)
+    @ApiOperation(value = "Registra um novo usuário", httpMethod = "POST", notes = "cria um novo usuário", response = User.class)
     @ApiResponses(value = { @ApiResponse(code = 200, message = "usuario criado com sucesso"),
             @ApiResponse(code = 500, message = "Erro interno em função da decodificação dos dados"),
             @ApiResponse(code = 400, message = "Erro no request em função da decodificação dos dados"),
@@ -181,16 +207,19 @@ public class UserREST {
         } catch (ConstraintViolationException ce) {
             // Handle bean validation issues
             builder = createViolationResponse(ce.getConstraintViolations());
+            log.severe(ce.getLocalizedMessage());
         } catch (ValidationException e) {
             // Handle the unique constrain violation
             Map<String, String> responseObj = new HashMap<>();
             responseObj.put("login", "Email taken");
             builder = Response.status(Response.Status.CONFLICT).entity(responseObj);
+            log.severe(e.getLocalizedMessage());
         } catch (Exception e) {
             // Handle generic exceptions
             Map<String, String> responseObj = new HashMap<>();
             responseObj.put("error", e.getMessage());
             builder = Response.status(Response.Status.BAD_REQUEST).entity(responseObj);
+            log.severe(e.getLocalizedMessage());
         }
 
         return builder.build();
@@ -251,12 +280,12 @@ public class UserREST {
      * @return True if the email already exists, and false otherwise
      */
     public boolean loginAlreadyExists(String email) {
-        User User = null;
+        User user = null;
         try {
-            User = userService.findByLogin(email);
+        	user = userService.findByLogin(email);
         } catch (NoResultException e) {
-            // ignore
+        	log.warning(e.getLocalizedMessage());
         }
-        return User != null;
+        return user != null;
     }
 }

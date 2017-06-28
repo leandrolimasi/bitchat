@@ -1,5 +1,5 @@
 angular
-    .module('app', ['ui.router', 'ui-notification'])
+    .module('app', ['ui.router', 'ui-notification', 'ngCookies'])
     .constant('BackendUrl', 'http://localhost:8080/bitchat')
     .constant('WebsocketUrl', 'ws://localhost:8080/bitchat')
     .config(function(NotificationProvider) {
@@ -14,17 +14,15 @@ angular
     .run(runBlock);
 
 /** @ngInject */
-function runBlock($rootScope, $state) {
+function runBlock($rootScope, $state, $cookies) {
 
     $rootScope.$on('$stateChangeStart', function(event, toState, toParams, fromState, fromParams){
-        console.log($rootScope.user);
+        console.log($cookies.getObject('user'));
 
         if (angular.isUndefined($rootScope.user)){
             $state.go('login');
         }
     });
-
-
 
 
 }

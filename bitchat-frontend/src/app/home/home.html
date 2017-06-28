@@ -3,7 +3,7 @@
 <section class="content-header">
     <h1>
         BitChat
-        <small>bem-vindo!</small>
+        <small>Bem-vindo {{$ctrl.user.name}} </small>
     </h1>
 </section>
 
@@ -30,18 +30,11 @@
                         <tr>
                             <th>Login</th>
                             <th>Status</th>
+                            <th></th>
                         </tr>
-                        <tr >
-                            <td>John Doe</td>
-                            <td><span class="label label-success">Online</span></td>
-                        </tr>
-                        <tr>
-                            <td>Alexander Pierce</td>
-                            <td><span class="label label-warning">Ausente</span></td>
-                        </tr>
-                        <tr>
-                            <td>Mike Doe</td>
-                            <td><span class="label label-danger">Offline</span></td>
+                        <tr ng-repeat="contact in $ctrl.listContacts"> 
+                            <td ui-sref="chat({login: contact.user.login, contactLogin: contact.contact.login})">{{contact.contact.name}}</td>
+                            <td ui-sref="chat({login: contact.user.login, contactLogin: contact.contact.login})"><span class="label label-success">Online</span></td>
                         </tr>
                     </table>
                 </div>

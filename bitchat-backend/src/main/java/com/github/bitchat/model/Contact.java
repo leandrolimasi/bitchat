@@ -16,34 +16,45 @@
  */
 package com.github.bitchat.model;
 
-import io.swagger.annotations.ApiModel;
-import io.swagger.annotations.ApiModelProperty;
-import org.hibernate.validator.constraints.NotEmpty;
-
-import javax.persistence.*;
-import javax.validation.constraints.NotNull;
-import javax.validation.constraints.Size;
-import javax.xml.bind.annotation.XmlRootElement;
 import java.io.Serializable;
 
+import javax.persistence.CascadeType;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.Id;
+import javax.persistence.ManyToOne;
+import javax.persistence.Table;
+import javax.validation.constraints.NotNull;
+import javax.xml.bind.annotation.XmlRootElement;
+
+import io.swagger.annotations.ApiModel;
+import io.swagger.annotations.ApiModelProperty;
+
+/** Entity for Contact
+ * 
+ * @author leandrolimadasilva
+ *
+ */
 @SuppressWarnings("serial")
 @Entity
 @XmlRootElement
 @Table
-@ApiModel( value = "Contact", description = "User Contact resource representation" )
+@ApiModel( value = "Contact", description = "Representação da Entidade Contato" )
 public class Contact implements Serializable {
 
     @Id
     @GeneratedValue
-    @ApiModelProperty( value = "codigo", required = true )
+    @ApiModelProperty( value = "id")
     private Long id;
 
     @ManyToOne(cascade = CascadeType.ALL)
-    @ApiModelProperty( value = "usuario", required = true )
+    @ApiModelProperty( value = "user", required = true )
+    @NotNull
     private User user;
 
     @ManyToOne(cascade = CascadeType.ALL)
-    @ApiModelProperty( value = "contato", required = true )
+    @ApiModelProperty( value = "contact", required = true )
+    @NotNull
     private User contact;
 
 
