@@ -7,6 +7,8 @@ function routesConfig($stateProvider, $urlRouterProvider, $locationProvider) {
     $locationProvider.html5Mode(true).hashPrefix('!');
     $urlRouterProvider.otherwise('/');
 
+
+
     $stateProvider
         .state('app', {
             url: '/',
@@ -25,5 +27,11 @@ function routesConfig($stateProvider, $urlRouterProvider, $locationProvider) {
         .state('registrar', {
             url: '/registrar',
             component: 'registrar'
+        });
+
+    $stateProvider
+        .state('chat', {
+            url: '/chat',
+            component: 'chat'
         });
 }
