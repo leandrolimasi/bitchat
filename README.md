@@ -42,7 +42,7 @@ After install all plugins, execute this
     $ npm install
     $ bower install
 
-Change a backend and websocket URL in index.js
+Change the backend and websocket URL in index.js
 
     .constant('BackendUrl', 'http://localhost:8080/bitchat')
     .constant('WebsocketUrl', 'ws://localhost:8080/bitchat')
@@ -57,6 +57,8 @@ And now build the backend project
     $ mvn clean install
 
 And deploy on Wildfly.
+
+Swagger Docs in http://localhost:8080/bitchat
 
 It's works fine ;)
 

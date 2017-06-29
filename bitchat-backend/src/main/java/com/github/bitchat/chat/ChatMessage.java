@@ -1,56 +1,47 @@
 package com.github.bitchat.chat;
 
-import java.util.Date;
+import java.io.StringWriter;
+
+import javax.json.JsonObject;
+
+import javax.json.Json;;
 
 /**
  * Created by leandrolimadasilva on 26/06/17.
  */
 public class ChatMessage {
 
-    private String content;
-    private String sender;
-    private Date received;
+	private JsonObject json;
 
+	/**
+	 *  Constructor
+	 *  
+	 * @param json
+	 */
+	public ChatMessage(JsonObject json) {
+		this.json = json;
+	}
+	
+	/** get json
+	 * 
+	 * @return
+	 */
+	public JsonObject getJson() {
+		return json;
+	}
+	
+	/** set json
+	 * 
+	 * @param json
+	 */
+	public void setJson(JsonObject json) {
+		this.json = json;
+	}
 
-    /**
-     * @return the content
-     */
-    public String getContent() {
-        return content;
-    }
-
-    /**
-     * @param content the content to set
-     */
-    public void setContent(String content) {
-        this.content = content;
-    }
-
-    /**
-     * @return the sender
-     */
-    public String getSender() {
-        return sender;
-    }
-
-    /**
-     * @param sender the sender to set
-     */
-    public void setSender(String sender) {
-        this.sender = sender;
-    }
-
-    /**
-     * @return the received
-     */
-    public Date getReceived() {
-        return received;
-    }
-
-    /**
-     * @param received the received to set
-     */
-    public void setReceived(Date received) {
-        this.received = received;
-    }
+	@Override
+	public String toString(){
+		StringWriter writer = new StringWriter();
+		Json.createWriter(writer).write(json);
+		return writer.toString();
+	}
 }

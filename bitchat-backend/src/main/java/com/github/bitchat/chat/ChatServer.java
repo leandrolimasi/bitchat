@@ -2,16 +2,20 @@ package com.github.bitchat.chat;
 
 
 
-import javax.websocket.*;
-import javax.websocket.server.PathParam;
-import javax.websocket.server.ServerEndpoint;
 import java.io.IOException;
 import java.util.Collections;
-import java.util.Date;
 import java.util.HashSet;
 import java.util.Set;
-import java.util.logging.Level;
 import java.util.logging.Logger;
+
+import javax.json.Json;
+import javax.websocket.EncodeException;
+import javax.websocket.OnClose;
+import javax.websocket.OnMessage;
+import javax.websocket.OnOpen;
+import javax.websocket.Session;
+import javax.websocket.server.PathParam;
+import javax.websocket.server.ServerEndpoint;
 
 /**
  * Created by leandrolimadasilva on 26/06/17.
@@ -19,44 +23,65 @@ import java.util.logging.Logger;
 @ServerEndpoint(value = "/chat/{room}", encoders = MessageEncoder.class, decoders = MessageDecoder.class)
 public class ChatServer {
 
-    private final Logger log = Logger.getLogger(getClass().getName());
+	private final Logger log = Logger.getLogger(getClass().getName());
 
-    static Set<Session> peers = Collections.synchronizedSet(new HashSet<Session>());
-
-
-    @OnOpen
-    public void open(final Session session, @PathParam("room") final String room) {
-        session.getUserProperties().put("room", room);
-    }
+	private static final Set<Session> sessions = Collections.synchronizedSet(new HashSet<Session>());
 
 
-    @OnMessage
-    public void onMessage(final Session session, final ChatMessage chatMessage) {
-        String room = (String) session.getUserProperties().get("room");
-        try {
-            for (Session s : session.getOpenSessions()) {
-                if (s.isOpen()
-                        && room.equals(s.getUserProperties().get("room"))) {
-                    s.getBasicRemote().sendObject(chatMessage);
-                }
-            }
-        } catch (IOException | EncodeException e) {
-            log.log(Level.WARNING, "onMessage failed", e);
-        }
-    }
+	@OnOpen
+	public void open(final Session session, @PathParam("room") final String room) {
+		sessions.add(session);
+		ChatMessage message = new ChatMessage(
+				Json.createObjectBuilder()
+				.add("type", "text")
+				.add("data", "User has connected")
+				.build());
 
+		for(Session s : sessions){
+			try {
+				s.getBasicRemote().sendObject(message);
+			} catch (IOException | EncodeException ex) {
+				log.severe(ex.getLocalizedMessage());
+			}
+		}
+		log.info(session.getId() + " has connected");
+	}
+
+
+	@OnMessage
+	public void onMessage(ChatMessage message, Session session){
+		for(Session s : sessions){
+			try {
+				s.getBasicRemote().sendObject(message);
+			} catch (IOException | EncodeException ex) {
+				log.severe(ex.getLocalizedMessage());
+			}
+		}
+		log.info(message.toString());
+	}
+
+	/**
+     * The user closes the connection.
+     * 
+     * Note: you can't send messages to the client from this method
+     */
     @OnClose
-    public void onClose(Session session) throws IOException, EncodeException {
-       /* System.out.println(String.format("%s left the chat room.", session.getId()));
-        peers.remove(session);
-        //notify peers about leaving the chat room
-        for (Session peer : peers) {
-            ChatMessage message = new ChatMessage();
-            message.setSender("Server");
-            message.setContent(String.format("%s left the chat room", (String) session.getUserProperties().get("user")));
-            message.setReceived(new Date());
-            peer.getBasicRemote().sendObject(message);
-        } */
-    }
+    public void onClose(Session session){
+        sessions.remove(session);
+                
+        ChatMessage message = new ChatMessage(Json.createObjectBuilder()
+                .add("type", "text")
+                .add("data", "User has disconnected")
+                .build());
+        
+        for(Session s : sessions){
+            try {
+                s.getBasicRemote().sendObject(message);
+            } catch (IOException | EncodeException ex) {
+            	log.severe(ex.getLocalizedMessage());
+            }
+        }
+        log.info("User disconnected");
+    }    
 
 }
