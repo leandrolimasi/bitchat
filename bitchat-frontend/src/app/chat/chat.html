@@ -10,12 +10,19 @@
                 </div>
                 <!-- /.box-header -->
                 <div class="box-body">
+
                     <!-- Conversations are loaded here -->
                     <div class="direct-chat-messages">
+
+                        <div ng-repeat="chat in $ctrl.chats">
+
+                        </div>
+
+
                         <!-- Message. Default to the left -->
                         <div class="direct-chat-msg">
                             <div class="direct-chat-info clearfix">
-                                <span class="direct-chat-name pull-left">Alexander Pierce</span>
+                                <span class="direct-chat-name pull-left">{{$ctrl.user.name}}</span>
                                 <span class="direct-chat-timestamp pull-right">23 Jan 2:00 pm</span>
                             </div>
                             <!-- /.direct-chat-info -->
@@ -29,7 +36,7 @@
                         <!-- Message to the right -->
                         <div class="direct-chat-msg right">
                             <div class="direct-chat-info clearfix">
-                                <span class="direct-chat-name pull-right">Sarah Bullock</span>
+                                <span class="direct-chat-name pull-right">{{$ctrl.contact.name}}</span>
                                 <span class="direct-chat-timestamp pull-left">23 Jan 2:05 pm</span>
                             </div>
                             <!-- /.direct-chat-info -->
@@ -65,11 +72,11 @@
                 </div>
                 <!-- /.box-body -->
                 <div class="box-footer">
-                    <form action="#" method="post">
+                    <form name="formChat">
                         <div class="input-group">
-                            <input type="text" name="message" placeholder="Type Message ..." class="form-control">
+                            <input type="text" name="message" ng-model="$ctrl.message" ng-required="true" placeholder="Type Message ..." class="form-control">
                             <span class="input-group-btn">
-                        <button type="submit" class="btn btn-primary btn-flat">Send</button>
+                        <button type="submit" ng-disabled="formChat.$invalid" ng-click="$ctrl.sendMessage()" class="btn btn-primary btn-flat">Send</button>
                       </span>
                         </div>
                     </form>

@@ -20,7 +20,7 @@ public class MessageEncoder implements Encoder.Text<ChatMessage> {
     @Override
     public String encode(ChatMessage message) throws EncodeException {
         return Json.createObjectBuilder()
-                .add("message", message.getContent())
+                .add("content", message.getContent())
                 .add("sender", message.getSender())
                 .add("received", "")
                 .build().toString();

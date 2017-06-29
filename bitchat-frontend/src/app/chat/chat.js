@@ -2,54 +2,45 @@ angular
     .module('app')
     .component('chat', {
         templateUrl: 'app/chat/chat.html',
-        controller: function (WebsocketUrl, $state, $http, $log, $scope, $rootScope, $stateParams) {
+        controller: function (WebsocketUrl, BackendUrl, $state, $http, $log, $scope, $rootScope, $stateParams, $q) {
             var ctrl = this;
+            ctrl.websocket;
+            ctrl.room;
+            ctrl.chats = [];
 
-            var websocket = new WebSocket(WebsocketUrl+"/chat");
 
-            ctrl.openChat = function(idUserContact, contactLogin) {
+            ctrl.openChat = function(login, contactLogin) {
 
-                websocket.onopen = function() {
-                    var message = { userContactId: idUserContact, messageType: 'OPEN', message: 'teste', sender: $stateParams.login, receiver: '' };
-                    websocket.send(JSON.stringify(message));
-                };
+                var promises = [];
+                promises.push($http.get(BackendUrl+"/rest/user/"+contactLogin));
+                promises.push($http.get(BackendUrl+"/rest/user/"+login));
 
-                websocket.onmessage = function(e) {
-                    var textAreaMessage = document.getElementById('message');
-                    var msgContainer = document.getElementById('msgContainer');
-                    if (msgContainer.childNodes.length == 100) {
-                        msgContainer.removeChild(msgContainer.childNodes[0]);
-                    }
+                $q.all(promises).then(function(results){
+                    ctrl.contact = results[0].data;
+                    ctrl.user = results[1].data;
+                    ctrl.room = ctrl.user.login +'-'+ctrl.contact.login;
+                    ctrl.websocket = new WebSocket(WebsocketUrl+"/chat/"+ctrl.room);
 
-                    var div = document.createElement('div');
-                    var textnode = document.createTextNode(e.data);
-                    div.appendChild(textnode);
-                    msgContainer.appendChild(div);
+                    ctrl.websocket.onopen = function(e) {
+                        $log.info(e);
+                    };
 
-                    msgContainer.scrollTop = msgContainer.scrollHeight;
-                    textAreaMessage.value = '';
-                };
+                    ctrl.websocket.onmessage = function(e) {
+                        ctrl.chats.push(JSON.parse(e.data));
+                    };
 
-                websocket.onerror = function(e) {};
-                websocket.onclose = function(e) {
+                    ctrl.websocket.onerror = function(e) {};
+                    ctrl.websocket.onclose = function(e) {};
 
-                };
+                });
 
-                var message = { userContactId: idUserContact, messageType: 'OPEN', message: 'teste', sender: $stateParams.login, receiver:'' };
-                websocket.send(JSON.stringify(message));
-
-                $scope.idSessao = idUserContact;
-                $scope.contactLogin = contactLogin;
-                $state.go('chat', {login: $stateParams.login, idSessao: idUserContact, contactLogin: contactLogin});
             };
 
-
-            ctrl.sendMessage = function(idUserContact) {
-                var message = {  userContactId: $stateParams.idSessao, messageType: 'MESSAGE', message: $scope.chatMessage,
-                    sender: $stateParams.login, receiver: $stateParams.contactLogin };
-
-                // Send a message through the web-socket
-                websocket.send(JSON.stringify(message));
+            ctrl.sendMessage = function() {
+                var msg = '{"content":"' + ctrl.message + '", "sender":"'
+                    + ctrl.user.login + '", "received":""}';
+                ctrl.websocket.send(msg);
+                ctrl.message= undefined;
             };
             
             ctrl.openChat($stateParams.login, $stateParams.contactLogin);

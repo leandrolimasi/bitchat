@@ -22,7 +22,7 @@ public class MessageDecoder implements Decoder.Text<ChatMessage>  {
     public ChatMessage decode(String textMessage) throws DecodeException {
         ChatMessage message = new ChatMessage();
         JsonObject jsonObject = Json.createReader(new StringReader(textMessage)).readObject();
-        message.setContent(jsonObject.getString("message"));
+        message.setContent(jsonObject.getString("content"));
         message.setSender(jsonObject.getString("sender"));
         message.setReceived(new Date());
         return message;
@@ -36,7 +36,7 @@ public class MessageDecoder implements Decoder.Text<ChatMessage>  {
      */
     @Override
     public boolean willDecode(String s) {
-        return false;
+        return true;
     }
 
     /**
