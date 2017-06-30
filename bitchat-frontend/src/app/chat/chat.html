@@ -1,95 +1,77 @@
 
 <section class="content">
-    <!-- Direct Chat -->
-    <div class="row">
-        <div class="col-md-12">
-            <!-- DIRECT CHAT PRIMARY -->
-            <div class="box box-primary direct-chat direct-chat-primary">
-                <div class="box-header with-border">
-                    <h3 class="box-title">Direct Chat</h3>
-                </div>
-                <!-- /.box-header -->
-                <div class="box-body">
-
-                    <!-- Conversations are loaded here -->
-                    <div class="direct-chat-messages">
-
-                        <div ng-repeat="chat in $ctrl.chats">
-
-                        </div>
-
-
-                        <!-- Message. Default to the left -->
-                        <div class="direct-chat-msg">
-                            <div class="direct-chat-info clearfix">
-                                <span class="direct-chat-name pull-left">{{$ctrl.user.name}}</span>
-                                <span class="direct-chat-timestamp pull-right">23 Jan 2:00 pm</span>
-                            </div>
-                            <!-- /.direct-chat-info -->
-                            <div class="direct-chat-text">
-                                Is this template really for free? That's unbelievable!
-                            </div>
-                            <!-- /.direct-chat-text -->
-                        </div>
-                        <!-- /.direct-chat-msg -->
-
-                        <!-- Message to the right -->
-                        <div class="direct-chat-msg right">
-                            <div class="direct-chat-info clearfix">
-                                <span class="direct-chat-name pull-right">{{$ctrl.contact.name}}</span>
-                                <span class="direct-chat-timestamp pull-left">23 Jan 2:05 pm</span>
-                            </div>
-                            <!-- /.direct-chat-info -->
-                            <div class="direct-chat-text">
-                                You better believe it!
-                            </div>
-                            <!-- /.direct-chat-text -->
-                        </div>
-                        <!-- /.direct-chat-msg -->
+    <form name="formChat">
+        <!-- Direct Chat -->
+        <div class="row">
+            <div class="col-md-12">
+                <!-- DIRECT CHAT PRIMARY -->
+                <div class="box box-primary direct-chat direct-chat-primary">
+                    <div class="box-header with-border">
+                        <h3 class="box-title">Direct Chat</h3>
                     </div>
-                    <!--/.direct-chat-messages-->
+                    <!-- /.box-header -->
+                    <div class="box-body">
 
-                    <!-- Contacts are loaded here -->
-                    <div class="direct-chat-contacts">
-                        <ul class="contacts-list">
-                            <li>
-                                <a href="#">
-                                    <div class="contacts-list-info">
-                            <span class="contacts-list-name">
-                              Count Dracula
-                              <small class="contacts-list-date pull-right">2/28/2015</small>
-                            </span>
-                                        <span class="contacts-list-msg">How have you been? I was...</span>
+                        <!-- Conversations are loaded here -->
+                        <div class="direct-chat-messages">
+
+
+                            <div ng-repeat="chat in $ctrl.chats track by $index">
+
+
+                                <!-- Message. Default to the left -->
+                                <div class="direct-chat-msg" ng-if="$ctrl.user.login == chat.sender">
+                                    <div class="direct-chat-info clearfix">
+                                        <span class="direct-chat-name pull-left">{{$ctrl.user.name}}</span>
+                                        <span class="direct-chat-timestamp pull-right">{{chat.received}}</span>
                                     </div>
-                                    <!-- /.contacts-list-info -->
-                                </a>
-                            </li>
-                            <!-- End Contact Item -->
-                        </ul>
-                        <!-- /.contatcts-list -->
+                                    <!-- /.direct-chat-info -->
+                                    <div class="direct-chat-text">
+                                        {{chat.content}}
+                                    </div>
+                                    <!-- /.direct-chat-text -->
+                                </div>
+                                <!-- /.direct-chat-msg -->
+
+
+                                <!-- Message to the right -->
+                                <div class="direct-chat-msg right" ng-if="$ctrl.contact.login == chat.sender">
+                                    <div class="direct-chat-info clearfix">
+                                        <span class="direct-chat-name pull-right">{{$ctrl.contact.name}}</span>
+                                        <span class="direct-chat-timestamp pull-left">{{chat.received}}</span>
+                                    </div>
+                                    <!-- /.direct-chat-info -->
+                                    <div class="direct-chat-text">
+                                        {{chat.content}}
+                                    </div>
+                                    <!-- /.direct-chat-text -->
+                                </div>
+                                <!-- /.direct-chat-msg -->
+                            </div>
+                        </div>
+                        <!--/.direct-chat-messages-->
                     </div>
-                    <!-- /.direct-chat-pane -->
-                </div>
-                <!-- /.box-body -->
-                <div class="box-footer">
-                    <form name="formChat">
+                    <!-- /.box-body -->
+                    <div class="box-footer">
+
                         <div class="input-group">
                             <input type="text" name="message" ng-model="$ctrl.message" ng-required="true" placeholder="Type Message ..." class="form-control">
                             <span class="input-group-btn">
-                        <button type="submit" ng-disabled="formChat.$invalid" ng-click="$ctrl.sendMessage()" class="btn btn-primary btn-flat">Send</button>
-                      </span>
+                                <button type="submit" ng-disabled="formChat.$invalid" ng-click="$ctrl.sendMessage()" class="btn btn-primary btn-flat">Send</button>
+                            </span>
                         </div>
-                    </form>
-                </div>
-                <!-- /.box-footer-->
-            </div>
-            <!--/.direct-chat -->
-        </div>
-    </div>
 
-    <div class="row">
-        <div class="col-xs-12">
-            <button class="btn btn-primary btn-block" ui-sref="home" >Sair</button>
+                    </div>
+                    <!-- /.box-footer-->
+                </div>
+                <!--/.direct-chat -->
+            </div>
         </div>
-    </div>
+
+        <div class="row">
+            <div class="col-xs-12">
+                <button class="btn btn-primary btn-block" ui-sref="home" >Sair</button>
+            </div>
+        </div>
+    </form>
 </section>

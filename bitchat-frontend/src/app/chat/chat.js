@@ -2,12 +2,13 @@ angular
     .module('app')
     .component('chat', {
         templateUrl: 'app/chat/chat.html',
+        bindings: {
+            chats: '='
+        },
         controller: function (WebsocketUrl, BackendUrl, $state, $http, $log, $scope, $rootScope, $stateParams, $q) {
             var ctrl = this;
             ctrl.websocket;
             ctrl.room;
-            ctrl.chats = [];
-
 
             ctrl.openChat = function(login, contactLogin) {
 
@@ -26,7 +27,17 @@ angular
                     };
 
                     ctrl.websocket.onmessage = function(e) {
-                        ctrl.chats.push(JSON.parse(e.data));
+                        if (!ctrl.chats){
+                            ctrl.chats = [];
+                        }
+
+                        var chat  = JSON.parse(e.data);
+
+                        if (chat.sender){
+                            chat.received = new Date();
+                            ctrl.chats.push(chat);
+                        }
+
                     };
 
                     ctrl.websocket.onerror = function(e) {};
@@ -40,7 +51,7 @@ angular
                 var msg = '{"content":"' + ctrl.message + '", "sender":"'
                     + ctrl.user.login + '", "received":""}';
                 ctrl.websocket.send(msg);
-                ctrl.message= undefined;
+                ctrl.message= '';
             };
             
             ctrl.openChat($stateParams.login, $stateParams.contactLogin);

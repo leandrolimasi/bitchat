@@ -31,21 +31,22 @@ angular
         	};
 
 
-            ctrl.addContact = function(contact) {
+            ctrl.addContact = function() {
                 
-                $http.get(BackendUrl+"/rest/user/"+contact.login).then(function(response) {
+                $http.get(BackendUrl+"/rest/user/"+ctrl.contact.login).then(function(response) {
                         var c = {}
                         c.contact = response.data;
                         c.user  = ctrl.user;
 
                         $http.post(BackendUrl+"/rest/user/addContact/", c).then(function(response) {
-
-                                Notification.success('Contact added');
+                                ctrl.listContacts();
+                                ctrl.contact.login = '';
+                                Notification.success('Contact added!');
                             },
 
                             function () {
 
-                                Notification.error('Error in add contact');
+                                Notification.error('Contact not found!');
                             });
 
                     },

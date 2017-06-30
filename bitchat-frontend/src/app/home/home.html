@@ -57,10 +57,10 @@
                     <div class="box-body">
                         <div class="input-group margin">
                             <form name="formContact">
-                                <input type="text" class="form-control" name="contact.login" ng-model="contact.login" ng-required="true">
+                                <input type="text" class="form-control" name="contact.login" ng-model="$ctrl.contact.login" ng-required="true">
                             </form>
                             <span class="input-group-btn">
-                              <button type="button" class="btn btn-info btn-flat" ng-click="$ctrl.addContact(contact)" ng-disabled="formContact.$invalid">Adicionar!</button>
+                              <button type="button" class="btn btn-info btn-flat" ng-click="$ctrl.addContact()" ng-disabled="formContact.$invalid">Adicionar!</button>
                             </span>
                         </div>
                     </div>
